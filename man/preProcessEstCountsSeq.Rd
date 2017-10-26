@@ -4,17 +4,18 @@
 \alias{preProcessEstCountsSeq}
 \title{preProcessEstCountsSeq}
 \usage{
-preProcessEstCountsSeq(object, regionMat, verbose = TRUE, initParamMethod)
+preProcessEstCountsSeq(object, regionMat, verbose = TRUE,
+  initParamMethod = "random")
 }
 \arguments{
 \item{object}{an object can be an \code{RGChannelSet} or
 \code{BSseq} object. The \code{object} can also be a
 data frame or matrix with observations (e.g. CpGs)
-on the rows and samples as the columns.}
+on the rows and whole blood samples as the columns.}
 
 \item{regionMat}{If the \code{object} is not an
 \code{RGChannelSet} or \code{BSseq} object, then
-the user must provide \code{regionMat}. 
+the user must provide \code{regionMat}.
 This must have the same number of
 rows as \code{object} (number of regions or CpGs)
 and one column for each cell type. The values in
@@ -25,7 +26,11 @@ not methylated (0).}
 \item{verbose}{TRUE/FALSE argument specifying if verbose
 messages should be returned or not. Default is TRUE.}
 
-\item{initParamMethod}{add more here}
+\item{initParamMethod}{method to initialize parameter estimates.
+Choose between "random" (randomly sample) or "knownRegions"
+(uses unmethyalted and methylated regions that were identified
+based on Reinus et al. (2012) cell sorted data.).
+Defaults to "random".}
 }
 \description{
 add more here

@@ -1,7 +1,7 @@
 ---
 title: "The methylCC user's guide"
 author: "Stephanie C. Hicks (shicks@jimmy.harvard.edu) and Rafael Irizarry (rafa@jimmy.harvard.edu)" 
-date: "July 26, 2017"
+date: "October 25, 2017"
 output: 
   BiocStyle::html_document
 vignette: >
@@ -20,7 +20,7 @@ There are several approaches available to adjust for differents in the
 relative proportion of cell types in whole blood measured from
 DNA methylation (DNAm). For example, *reference-based approaches*
 require the use of reference data sets made up of purified cell types to
-identify cell-type specific DNAm signatures. These cell-type specific DNAm
+identify cell type-specific DNAm signatures. These cell type-specific DNAm
 signatures are used to estimate the relative proportions of cell types
 directly, but these reference data sets are laborious and expensive to
 collect. Furthermore, these reference data sets will need to be
@@ -29,14 +29,13 @@ measuring DNAm because the observed methylation levels for the same CpGs
 in the same sample vary depending the platform technology.
 
 In contrast, there are *reference-free approaches*,
-which are based on methods related
-to surrogate variable analysis or
+which are based on methods related to surrogate variable analysis or
 linear mixed models. These approaches do not provide
 estimates of the relative proportions of cell types, but rather these
 methods just remove the variability induced from the differences in
 relative cell type proportions in whole blood samples.
 
-Here we present a statistical model that estimates the cell composition
+Here, we present a statistical model that estimates the cell composition
 of whole blood samples measured from DNAm. The method can be applied
 to microarray or sequencing data (for example whole-genome bisulfite
 sequencing data, WGBS, reduced representation bisulfite sequencing
@@ -50,7 +49,7 @@ observed measurements being platform dependent.
 
 # Getting Started
 
-Load the `compote` R package and other packages that we'll need 
+Load the `methylCC` R package and other packages that we'll need 
 later on. 
 
 ```{r loadlibs, message=FALSE, warning=FALSE}
@@ -58,7 +57,6 @@ library(methylCC)
 library(minfi)
 library(tidyr)
 library(ggplot2)
-# library(cowplot)
 ```
 
 
@@ -86,21 +84,18 @@ rgset <- FlowSorted.Blood.450k[,
 The `estimateCC()` function must have
 one object as input:
 
-1. an `object` which is inherited from an
-`eSet` such as an `RGChannelSet` from
+1. an `object` such as an `RGChannelSet` from
 the R package `minfi` or a `BSseq` object
-from the R package `bsseq`. The `object`
-can also be a data frame or matrix with observations
-(e.g. CpGs) on the rows and samples as the columns.
-
-
+from the R package `bsseq`. This object should 
+contain observed DNAm levels at CpGs (rows) 
+in a set of $N$ whole blood samples (columns). 
 
 ## Running `estimateCC()`
 
 In this example, we are interested in estimating the cell
 composition of the whole blood samples listed in the
 `FlowSorted.Blood.450k` R/Bioconductor package.
-To run the `compote::estimateCC()` function,
+To run the `methylcC::estimateCC()` function,
 just provide the `RGChannelSet`. This will
 create an `estimateCC` object. We
 will call the object `est`.
@@ -111,13 +106,6 @@ est <- estimateCC(object = rgset, verbose = FALSE)
 est
 ```
 
-Here we are also specifying that we would like standard
-error estimates to be included setting the
-parameters `includeSE=TRUE` and `B` to a
-number larger than 0. `B` represents the number
-of bootstrapped samples to create to calculate the
-standard errors of the cell composition estimates.
-
 To see the cell composition estimates, use the
 `cellcounts()` function. To see summary information 
 about the object, use the `summary()` function.
@@ -125,11 +113,6 @@ about the object, use the `summary()` function.
 ```{r run-estimateCC-summaries}
 cellcounts(est)
 summary(est)
-```
-
-To see a plot of the cell composition estimates
-```{r run-estimateCC-plots, fig.height=6, fig.width=8}
-estimateCCPlot(est)
 ```
 
 
@@ -146,7 +129,7 @@ countsMinfi <- minfi::estimateCellCounts(rgset)
 data.frame("Tcell" = rowSums(countsMinfi[,1:3]), countsMinfi[,c(4,5,6)])
 ```
 
-Then, we can compare the estimates to `compote::estimateCC()`. 
+Then, we can compare the estimates to `methylcC::estimateCC()`. 
 
 ```{r compare-estimates}
 df1 = gather(cbind("samples" = summary(est)$sampleNames,
@@ -158,9 +141,9 @@ df2 = gather(cbind("samples" = summary(est)$sampleNames, cellcounts(est)),
 
 dfcombined <- dplyr::full_join(df1, df2, by = c("samples", "celltype"))
 
-ggplot(dfcombined, aes(x=est.x, y = est.y)) +
-    geom_abline(intercept = 0, slope = 1) + xlim(0,1) + ylim(0,1) +
-    facet_wrap(~celltype) + geom_point() +
+ggplot(dfcombined, aes(x=est.x, y = est.y, color = celltype)) +
+    geom_point() + xlim(0,1) + ylim(0,1) +
+    geom_abline(intercept = 0, slope = 1) +
     xlab("Using minfi::estimateCellCounts()") + ylab("Using methylCC::estimateCC()") +
     labs(title = "Comparing cell composition estimates")
 ```

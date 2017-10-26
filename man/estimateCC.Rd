@@ -5,8 +5,8 @@
 \title{estimateCC}
 \usage{
 estimateCC(object, regionMat = NULL, verbose = TRUE, epsilon = 0.01,
-  maxIter = 50, initParamMethod = "random", includeSE = FALSE, B = 0,
-  a0init = NULL, a1init = NULL, sig0init = NULL, sig1init = NULL)
+  maxIter = 100, initParamMethod = "random", a0init = NULL,
+  a1init = NULL, sig0init = NULL, sig1init = NULL, tauinit = NULL)
 }
 \arguments{
 \item{object}{an object can be an \code{RGChannelSet} or
@@ -16,7 +16,7 @@ on the rows and samples as the columns.}
 
 \item{regionMat}{If the \code{object} is not an
 \code{RGChannelSet} or \code{BSseq} object, then
-the user must provide \code{regionMat}. 
+the user must provide \code{regionMat}.
 This must have the same number of
 rows as \code{object} (number of regions or CpGs)
 and one column for each cell type. The values in
@@ -27,29 +27,27 @@ not methylated (0).}
 \item{verbose}{TRUE/FALSE argument specifying if verbose
 messages should be returned or not. Default is TRUE.}
 
-\item{epsilon}{Threshold for Expectation-Maximization
-(EM) algorithm}
+\item{epsilon}{Threshold for EM algorithm to check
+for convergence. Default is 0.01.}
 
 \item{maxIter}{Maximum number of iterations for EM
-algorithm}
+algorithm. Default is 100 iterations.}
 
-\item{initParamMethod}{add more here}
+\item{initParamMethod}{method to initialize parameter estimates.
+Choose between "random" (randomly sample) or "knownRegions"
+(uses unmethyalted and methylated regions that were identified
+based on Reinus et al. (2012) cell sorted data.).
+Defaults to "random".}
 
-\item{includeSE}{TRUE/FALSE argument specifying if
-standard error estimates should be included. Default
-is FALSE The parameter \code{B} must be set to a value
-greater than 0 if \code{includeSE == TRUE}}
+\item{a0init}{Default NULL. Initial mean methylation level in unmethylated regions}
 
-\item{B}{Number of bootstrap samples to simulate to
-calculate SE estimates.}
+\item{a1init}{Default NULL. Initial mean methylation level in methylated regions}
 
-\item{a0init}{add more here.}
+\item{sig0init}{Default NULL. Initial var methylation level in unmethylated regions}
 
-\item{a1init}{add more here.}
+\item{sig1init}{Default NULL. Initial var methylation level in methylated regions}
 
-\item{sig0init}{add more here.}
-
-\item{sig1init}{add more here.}
+\item{tauinit}{Default NULL. Initial var for measurement error}
 }
 \description{
 Estimate cell composition from seq data

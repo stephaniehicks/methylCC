@@ -1,24 +1,23 @@
 Package: methylCC
 Title: Estimate the cell composition of whole blood in DNA methylation samples
-Version: 0.0.1
+Version: 0.0.2
 Author: Stephanie Hicks and Rafael Irizarry
 Maintainer: Stephanie Hicks <shicks@jimmy.harvard.edu>
 Description: A tool to estimate the cell composition
-    of whole blood in DNA methylation measured on any
+    of DNA methylation whole blood sample measured on any
     platform technology (microarray and sequencing).
 Imports:
     Biobase,
     GenomicRanges,
     dplyr,
     magrittr,
-    tidyr,
     minfi,
     bsseq,
     quadprog,
-    mclust,
-    ggplot2
-Depends: R (>= 3.4.1)
+Depends: R (>= 3.4.0)
 Suggests:
+    tidyr,
+    ggplot2,
     knitr,
     RUnit,
     BiocGenerics,

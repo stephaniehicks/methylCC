@@ -17,8 +17,6 @@ summary(object, ...)
 }
 \arguments{
 \item{object}{a \code{estimateCC} object}
-
-\item{...}{other}
 }
 \description{
 Accessors for the 'summary' slot of a estimateCC object.

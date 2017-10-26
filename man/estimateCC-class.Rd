@@ -3,8 +3,7 @@
 \docType{class}
 \name{estimateCC-class}
 \alias{estimateCC-class}
-\alias{estimateCC}
-\title{estimateCC Class}
+\title{estimateCC}
 \description{
-This is the estimateCC class
+This is the S4 class estimateCC container
 }
