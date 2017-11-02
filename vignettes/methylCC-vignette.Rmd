@@ -1,7 +1,7 @@
 ---
 title: "The methylCC user's guide"
 author: "Stephanie C. Hicks (shicks@jimmy.harvard.edu) and Rafael Irizarry (rafa@jimmy.harvard.edu)" 
-date: "October 25, 2017"
+date: "November 2, 2017"
 output: 
   BiocStyle::html_document
 vignette: >
@@ -101,7 +101,7 @@ create an `estimateCC` object. We
 will call the object `est`.
 
 
-```{r run-estimateCC1}
+```{r run-estimateCC1, message=FALSE}
 est <- estimateCC(object = rgset, verbose = FALSE)
 est
 ```

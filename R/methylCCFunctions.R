@@ -420,19 +420,15 @@ estimateCC <- function(object, regionMat = NULL, verbose = TRUE,
                        a0init = NULL, a1init = NULL, sig0init = NULL,
                        sig1init = NULL, tauinit = NULL)
 {
-
     if(!(initParamMethod %in% c("random", "knownRegions")) ){
       stop("The initParamMethod must be set to 'random' or 'knownRegions'.")
     }
     dat = preProcessEstCountsSeq(object, regionMat=regionMat, verbose=verbose,
                                  initParamMethod=initParamMethod)
-    ymat <- as.matrix(dat$ymat[apply(dat$ymat, 1, function(x){all(!is.na(x))}), ])
-    # ymat <- apply(dat$ymat, 2, function(x){
-    #  x[is.na(x)] <- mean(x, na.rm = TRUE)
-    #  x })
+    ymat <- as.matrix(dat$ymat)
     n <- dat$n
     ids <- dat$ids
-    zmat <- dat$zmat[apply(dat$ymat, 1, function(x){all(!is.na(x))}), ]
+    zmat <- dat$zmat
     K = ncol(zmat)
     R = nrow(zmat)
 
@@ -469,70 +465,121 @@ estimateCC <- function(object, regionMat = NULL, verbose = TRUE,
 
     methylCCEngine <- function(YMat, ZMat, current.pi.mle, current.theta,
                                epsilon, maxIter){
-
-        final.theta <- NULL
-        final.pi.mle <- NULL
-        count = 0
-        repeat{
-            # E-Step
-            EStep0 <- methylCC_Estep(ZMat=ZMat, pi.mle=current.pi.mle, theta=current.theta,
-                               YMat=YMat, methStatus=0)
-            EStep1 <- methylCC_Estep(ZMat=ZMat, pi.mle=current.pi.mle, theta=current.theta,
-                               YMat=YMat, methStatus=1)
-
-            # M-Step
-            update.step <- methylCC_MStep(ZMat=ZMat, pi.mle=current.pi.mle, theta = current.theta,
-                                YMat=YMat, EStep0=EStep0, EStep1=EStep1)
-
-           if(abs(update.step$theta$likFun - current.theta$likFun) >= epsilon){
+            final.theta <- NULL
+            final.pi.mle <- NULL
+            count = 0
+            
+            repeat{
+              # E-Step
+              EStep0 <- methylCC_Estep(ZMat=ZMat, pi.mle=current.pi.mle, theta=current.theta,
+                                       YMat=YMat, methStatus=0)
+              EStep1 <- methylCC_Estep(ZMat=ZMat, pi.mle=current.pi.mle, theta=current.theta,
+                                       YMat=YMat, methStatus=1)
+              
+              # M-Step
+              update.step <- methylCC_MStep(ZMat=ZMat, pi.mle=current.pi.mle, theta = current.theta,
+                                            YMat=YMat, EStep0=EStep0, EStep1=EStep1)
+              
+              if(abs(update.step$theta$likFun - current.theta$likFun) >= epsilon){
                 final.pi.mle <- update.step$pi.mle
                 final.theta <- rbind(final.theta, update.step$theta)
                 current.pi.mle <- update.step$pi.mle
                 current.theta <- update.step$theta
                 count = count + 1
-
+                
                 if(count > maxIter){
-                    break
+                  break
                 }
-            } else {
+              } else {
                 break
+              }
             }
-        }
-        return(list("pi.mle" = final.pi.mle, "theta" = final.theta))
+            return(list("pi.mle" = final.pi.mle, "theta" = final.theta))
     }
 
+    
+    # set up objects
+    cellcounts  <- data.frame(array(NA, dim=c(n,K)))
+    theta.final <- data.frame(array(NA, dim=c(n,6)))
+    nRegions.final = array(NA, dim = n)                
+    samples.with.na <- apply(ymat, 2, function(x) {any(is.na(x))})
+    
     ## Include verbose messages about parameter estimation
     if(verbose){
       mes <- "[estimateCC] Starting parameter estimation using %s regions."
-      message(sprintf(mes, R))
+      message(sprintf(mes, R, n))
     }
+    
+    if(any(samples.with.na)){
 
-    # Initialize MLEs
-    init.step <- initializeMLEs(initParamMethod=initParamMethod,
-                                Ys=ymat, Zs=zmat, a0init=a0init,
-                                a1init=a1init, sig0init=sig0init,
-                                sig1init=sig1init, tauinit=tauinit)
+      # samples with NAs in rows         
+      for(ii in which(samples.with.na)){
+        keepme <- c(!is.na(ymat[,ii]))
+        YMatSub <- t(t(ymat[keepme,ii]))
+        ZMatSub <- zmat[keepme,]
+        RSub = nrow(ZMatSub)
+        nRegions.final[ii] <- sum(keepme)
+    
+        # Initialize MLEs
+        init.step <- initializeMLEs(initParamMethod=initParamMethod,
+                                    Ys=YMatSub, Zs=ZMatSub, a0init=a0init,
+                                    a1init=a1init, sig0init=sig0init,
+                                    sig1init=sig1init, tauinit=tauinit)
+      
+        # Run EM algorithm
+        finalMLEs <- methylCCEngine(YMat = YMatSub, ZMat = ZMatSub,
+                                    current.pi.mle = init.step$pi.mle,
+                                    current.theta = init.step$theta,
+                                    epsilon=epsilon, maxIter = maxIter)
+      
+        cellcounts[ii,] <- as.data.frame(finalMLEs$pi.mle)
+        theta.final[ii,] <- as.data.frame(finalMLEs$theta[nrow(finalMLEs$theta), ])
+      }
+    } 
+    
+    if(any(!samples.with.na)){
+      # Initialize MLEs
+      init.step <- initializeMLEs(initParamMethod=initParamMethod,
+                                  Ys=ymat[,!samples.with.na], Zs=zmat, 
+                                  a0init=a0init, a1init=a1init, 
+                                  sig0init=sig0init, sig1init=sig1init, 
+                                  tauinit=tauinit)
 
-    # Run EM algorithm
-    finalMLEs <- methylCCEngine(YMat = ymat, ZMat = zmat,
-                                current.pi.mle = init.step$pi.mle,
-                                current.theta = init.step$theta,
-                                epsilon=epsilon, maxIter = maxIter)
+        # Run EM algorithm
+        finalMLEs <- methylCCEngine(YMat = ymat[,!samples.with.na], ZMat = zmat,
+                                    current.pi.mle = init.step$pi.mle,
+                                    current.theta = init.step$theta,
+                                    epsilon=epsilon, maxIter = maxIter)
 
+      # recored results
+      cellcounts[!samples.with.na,] <- as.data.frame(finalMLEs$pi.mle)
+      nRegions.final[!samples.with.na] <- rep(R, sum(!samples.with.na))
+      if(all(!samples.with.na)){ 
+        theta.all.final <-  as.data.frame(finalMLEs$theta)
+      } else { 
+        theta.final[!samples.with.na,] <- as.data.frame(t(replicate(2,c(finalMLEs$theta[nrow(finalMLEs$theta), ]))))
+      }
+      
+    }
+    
     if(verbose){
-          mes <- "[estimateCC] Parameter estimates obtained in %s iterations."
-          message(sprintf(mes, nrow(finalMLEs$theta) - 1))
+      mes <- "[estimateCC] Parameter estimation complete."
+      message(sprintf(mes))
     }
-
-    cellcounts = as.data.frame(finalMLEs$pi.mle)
+    
+    
     colnames(cellcounts) <- ids
     results@cellcounts <- cellcounts
-    results@theta <- finalMLEs$theta
+    if(all(!samples.with.na)){ 
+      results@theta <- theta.all.final
+    } else { 
+      results@theta <- theta.final
+    }  
     results@summary <- list("class" = class(object),
                             "nSamples" = n, "cellTypes" = ids,
                             "sampleNames" = colnames(ymat),
                             "initParamMethod" = initParamMethod,
-                            "nRegions" = R)
+                            "nRegions" = nRegions.final)
     return(results)
 }
 
