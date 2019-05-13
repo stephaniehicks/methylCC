@@ -3,21 +3,19 @@
 \docType{methods}
 \name{summary}
 \alias{summary}
-\alias{summary}
-\alias{summary.estimateCC}
-\alias{summary,estimateCC-method}
-\alias{summary,estimateCC-method}
+\alias{summary.estimatecc}
+\alias{summary,estimatecc-method}
 \title{summary}
 \usage{
 summary(object, ...)
 
-\S4method{summary}{estimateCC}(object)
+\S4method{summary}{estimatecc}(object)
 
-\S4method{summary}{estimateCC}(object)
+\S4method{summary}{estimatecc}(object)
 }
 \arguments{
-\item{object}{a \code{estimateCC} object}
+\item{object}{a \code{estimatecc} object}
 }
 \description{
-Accessors for the 'summary' slot of a estimateCC object.
+Accessors for the 'summary' slot of a estimatecc object.
 }

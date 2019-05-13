@@ -5,9 +5,9 @@
 #' @export
 setGeneric("summary", function(object) standardGeneric("summary"))
 
-#' @title cellcounts
-#' @name cellcounts
-#' @rdname cellcounts
-#' @aliases cellcounts
+#' @title cell_counts
+#' @name cell_counts
+#' @rdname cell_counts
+#' @aliases cell_counts
 #' @export
-setGeneric("cellcounts", function(object) standardGeneric("cellcounts"))
+setGeneric("cell_counts", function(object) standardGeneric("cell_counts"))

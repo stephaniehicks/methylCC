@@ -1,65 +1,65 @@
-#' @title estimateCC
+#' @title estimatecc
 #'
-#' @description This is the S4 class estimateCC container
+#' @description This is the S4 class estimatecc container
 #'
-#' @exportClass estimateCC
+#' @exportClass estimatecc
 #'
-setClass(Class = "estimateCC",
+setClass(Class = "estimatecc",
          representation = representation(
            summary = "list",
-           cellcounts = "data.frame",
+           cell_counts = "data.frame",
            theta = "data.frame",
-           YMat = "data.frame",
-           ZMat = "data.frame",
-           grObject = "GRanges",
-           keepDMRs = "GRanges")
+           ymat = "data.frame",
+           zmat = "data.frame",
+           gr_object = "GRanges",
+           keep_dmrs = "GRanges")
 )
 
-setMethod("show", "estimateCC",
+setMethod("show", "estimatecc",
           function(object){
-            cat("estimateCC: Estimate Cell Composition of Whole Blood Samples using DNA methylation\n")
+            cat("estimatecc: Estimate Cell Composition of Whole Blood Samples using DNA methylation\n")
             cat("   Input object class: ", object@summary$class, "\n")
-            cat("   Reference cell types: ", object@summary$cellTypes, "\n")
-            cat("   Number of Whole Blood Samples: ", paste(object@summary$nSamples), "\n")
+            cat("   Reference cell types: ", object@summary$celltypes, "\n")
+            cat("   Number of Whole Blood Samples: ", paste(object@summary$n_samples), "\n")
           }
 )
 
-#' @title Accessors for the 'summary' slot of a estimateCC object.
+#' @title Accessors for the 'summary' slot of a estimatecc object.
 #'
-#' @description Accessors for the 'summary' slot of a estimateCC object.
+#' @description Accessors for the 'summary' slot of a estimatecc object.
 #'
 #' @usage
-#' \S4method{summary}{estimateCC}(object)
+#' \S4method{summary}{estimatecc}(object)
 #'
 #' @docType methods
 #' @name summary
 #' @rdname summary
-#' @aliases summary summary,estimateCC-method
-#' @param object a \code{estimateCC} object
-summary.estimateCC <- function(object) object@summary
+#' @aliases summary summary,estimatecc-method
+#' @param object a \code{estimatecc} object
+summary.estimatecc <- function(object) object@summary
 
 #' @title summary
 #' @rdname summary
 #' @export
-setMethod("summary", signature(object="estimateCC"), summary.estimateCC)
+setMethod("summary", signature(object="estimatecc"), summary.estimatecc)
 
 
-#' @title Accessors for the 'cellcounts' slot of a estimateCC object.
+#' @title Accessors for the 'cell_counts' slot of a estimatecc object.
 #'
-#' @description Accessors for the 'cellcounts' slot of a estimateCC object.
+#' @description Accessors for the 'cell_counts' slot of a estimatecc object.
 #'
 #' @usage
-#' \S4method{cellcounts}{estimateCC}(object)
+#' \S4method{cell_counts}{estimatecc}(object)
 #'
 #' @docType methods
-#' @name cellcounts
-#' @rdname cellcounts
-#' @aliases cellcounts cellcounts,estimateCC-method
-#' @param object a \code{estimateCC} object
-cellcounts.estimateCC <- function(object) object@cellcounts
+#' @name cell_counts
+#' @rdname cell_counts
+#' @aliases cell_counts cell_counts,estimatecc-method
+#' @param object a \code{estimatecc} object
+cell_counts.estimatecc <- function(object) object@cell_counts
 
-#' @title cellcounts
-#' @rdname cellcounts
+#' @title cell_counts
+#' @rdname cell_counts
 #' @export
-setMethod("cellcounts", signature(object="estimateCC"), cellcounts.estimateCC)
+setMethod("cell_counts", signature(object="estimatecc"), cell_counts.estimatecc)
 
