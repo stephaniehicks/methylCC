@@ -74,13 +74,24 @@ estimatecc <- function(object, find_dmrs_object = NULL, region_mat = NULL,
       }
     }
   }
+  
+  dat <- .preprocess_estimatecc(object, region_mat=region_mat, verbose=verbose,
+                                 init_param_method=init_param_method, 
+                                 celltype_specific_dmrs = celltype_specific_dmrs)
+  ymat <- as.matrix(dat$ymat)
+  n <- dat$n
+  ids <- dat$ids
+  zmat <- dat$zmat
+  K = ncol(zmat)
+  R = nrow(zmat)
+  
   if(is.null(find_dmrs_object)){
     if(is.null(region_mat)){
       dmrs_found <- 
-        find_dmrs(verbose = TRUE, gr_target=NULL, num_regions = 50, 
+        find_dmrs(verbose = TRUE, gr_target=dat$gr_object, num_regions = 50, 
                   num_cpgs=50, include_cpgs = FALSE, include_dmrs = TRUE, 
                   bumphunter_beta_cutoff = 0.2, 
-                  dmr_up_cutoff = 0.6, dmr_down_cutoff = 0.8,
+                  dmr_up_cutoff = 0.5, dmr_down_cutoff = 0.4,
                   dmr_pval_cutoff = 1e-11, cpg_pval_cutoff = 1e-08,
                   pairwise_comparison = FALSE, 
                   mset_train_flow_sort = NULL)
@@ -92,15 +103,6 @@ estimatecc <- function(object, find_dmrs_object = NULL, region_mat = NULL,
                 region_mat is not set to NULL.") 
     }
   }
-  dat <- .preprocess_estimatecc(object, region_mat=region_mat, verbose=verbose,
-                                 init_param_method=init_param_method, 
-                                 celltype_specific_dmrs = celltype_specific_dmrs)
-  ymat <- as.matrix(dat$ymat)
-  n <- dat$n
-  ids <- dat$ids
-  zmat <- dat$zmat
-  K = ncol(zmat)
-  R = nrow(zmat)
   
   results <- new("estimatecc")
   results@ymat <- as.data.frame(dat$ymat)
@@ -115,7 +117,7 @@ estimatecc <- function(object, find_dmrs_object = NULL, region_mat = NULL,
   
   # set up objects
   cell_counts  <- data.frame(array(NA, dim=c(n,K)))
-  theta_final <- data.frame(array(NA, dim=c(n,6)))
+  # theta_final <- data.frame(array(NA, dim=c(n,6)))
   nregions_final = array(NA, dim = n)                
   samples_with_na <- apply(ymat, 2, function(x) { any(is.na(x)) })
   
@@ -151,38 +153,51 @@ estimatecc <- function(object, find_dmrs_object = NULL, region_mat = NULL,
                           epsilon=epsilon, max_iter = max_iter)
       
       cell_counts[ii,] <- as.data.frame(finalMLEs$pi_mle)
-      theta_final[ii,] <- as.data.frame(
-        finalMLEs$theta[nrow(finalMLEs$theta), ])
+      # theta_final[ii,] <- as.data.frame(
+      #   finalMLEs$theta[nrow(finalMLEs$theta), ])
     }
   } 
   
   if(any(!samples_with_na)){
-    # Initialize MLEs
-    init_step <- 
-      .initializeMLEs(init_param_method = init_param_method,
-                      n = n, K = K, 
-                      Ys = ymat[,!samples_with_na], Zs = zmat, 
-                      a0init = a0init, a1init = a1init, 
-                      sig0init = sig0init, sig1init = sig1init, 
-                      tauinit = tauinit)
     
-    # Run EM algorithm
-    finalMLEs <- 
-      .methylcc_engine(Ys = ymat[,!samples_with_na], Zs = zmat,
-                        current_pi_mle = init_step$init_pi_mle,
-                        current_theta = init_step$init_theta,
-                        epsilon=epsilon, max_iter = max_iter)
+    ymat_sub <- ymat[, !samples_with_na]
+    cut_samples <- factor(cut(seq_len(ncol(ymat_sub)),
+                              breaks = unique(c(seq(0, ncol(ymat_sub), by = 100), 
+                                         ncol(ymat_sub)))))
+    
+    final_mles <- NULL
+    for(ind in seq_len(length(levels(cut_samples)))){
+      keep_inds <- (cut_samples == levels(cut_samples)[ind])
+      
+      # Initialize MLEs
+      init_step <- 
+        .initializeMLEs(init_param_method = init_param_method,
+                        n = n, K = K, 
+                        Ys = ymat_sub[, keep_inds], Zs = zmat, 
+                        a0init = a0init, a1init = a1init, 
+                        sig0init = sig0init, sig1init = sig1init, 
+                        tauinit = tauinit)
+    
+      # Run EM algorithm
+      finalMLEs <- 
+        .methylcc_engine(Ys = ymat_sub[, keep_inds], Zs = zmat,
+                         current_pi_mle = init_step$init_pi_mle,
+                         current_theta = init_step$init_theta,
+                         epsilon=epsilon, max_iter = max_iter)
+      final_mles <- rbind(final_mles, finalMLEs$pi_mle)
+      print(levels(cut_samples)[ind])
+    }
     
     # recored results
-    cell_counts[!samples_with_na,] <- as.data.frame(finalMLEs$pi_mle)
+    cell_counts[!samples_with_na,] <- as.data.frame(final_mles)
     nregions_final[!samples_with_na] <- rep(R, sum(!samples_with_na))
-    if(all(!samples_with_na)){ 
-      theta_all_final <-  as.data.frame(finalMLEs$theta)
-    } else { 
-      theta_final[!samples_with_na,] <- 
-        as.data.frame(t(replicate(sum(!samples_with_na),
-                                  c(finalMLEs$theta[nrow(finalMLEs$theta), ]))))
-    }
+    # if(all(!samples_with_na)){ 
+    #  theta_all_final <-  as.data.frame(finalMLEs$theta)
+    # } else { 
+    #   theta_final[!samples_with_na,] <- 
+    #    as.data.frame(t(replicate(sum(!samples_with_na),
+    #                               c(finalMLEs$theta[nrow(finalMLEs$theta), ]))))
+    # }
   }
   
   if(verbose){
@@ -193,11 +208,11 @@ estimatecc <- function(object, find_dmrs_object = NULL, region_mat = NULL,
   
   colnames(cell_counts) <- ids
   results@cell_counts <- cell_counts
-  if(all(!samples_with_na)){ 
-    results@theta <- theta_all_final
-  } else { 
-    results@theta <- theta_final
-  }  
+  # if(all(!samples_with_na)){ 
+  #  results@theta <- theta_all_final
+  # } else { 
+  #  results@theta <- theta_final
+  # }  
   results@summary <- list("class" = class(object),
                           "n_samples" = n, "celltypes" = ids,
                           "sample_names" = colnames(ymat),

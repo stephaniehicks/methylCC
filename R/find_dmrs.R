@@ -48,7 +48,7 @@ find_dmrs <- function(verbose=TRUE, gr_target=NULL,
                       include_cpgs = FALSE, include_dmrs = TRUE,
                       num_cpgs=50, num_regions=50, 
                       bumphunter_beta_cutoff = 0.2, 
-                      dmr_up_cutoff = 0.6, dmr_down_cutoff = 0.5,
+                      dmr_up_cutoff = 0.5, dmr_down_cutoff = 0.4,
                       dmr_pval_cutoff = 1e-11, cpg_pval_cutoff = 1e-08,
                       cpg_up_dm_cutoff = 0, cpg_down_dm_cutoff = 0, 
                       pairwise_comparison = FALSE, 
@@ -280,17 +280,18 @@ find_dmrs <- function(verbose=TRUE, gr_target=NULL,
   
   # Houseman CpGs
   comp_data <- minfi:::pickCompProbes(mset_train_flow_sort, cellTypes = cell_levels, 
-                                      compositeCellType = "Blood", probeSelect = "auto")
+                                      compositeCellType = "Blood", probeSelect = "auto", 
+                                      numProbes = num_cpgs)
   regions_houseman <- granges(mset_train_flow_sort)[rownames(comp_data$coefEsts), ]
-  zmat_houseman = rbind(matrix(1,50, 6), matrix(0, 50, 6), 
-                        matrix(1,50, 6), matrix(0, 50, 6), 
-                        matrix(1,50, 6), matrix(0, 50, 6), 
-                        matrix(1,50, 6), matrix(0, 50, 6), 
-                        matrix(1,50, 6), matrix(0, 50, 6), 
-                        matrix(1,50, 6), matrix(0, 50, 6))
+  zmat_houseman = rbind(matrix(1,num_cpgs, 6), matrix(0, num_cpgs, 6), 
+                        matrix(1,num_cpgs, 6), matrix(0, num_cpgs, 6), 
+                        matrix(1,num_cpgs, 6), matrix(0, num_cpgs, 6), 
+                        matrix(1,num_cpgs, 6), matrix(0, num_cpgs, 6), 
+                        matrix(1,num_cpgs, 6), matrix(0, num_cpgs, 6), 
+                        matrix(1,num_cpgs, 6), matrix(0, num_cpgs, 6))
   for(i in 1:6){
-    zmat_houseman[(50*(i-1)*2 + 1):(50*(i-1)*2 + 50), i] <- 0
-    zmat_houseman[(50*(i-1)*2 + 50 + 1):(50*i*2), i] <- 1 
+    zmat_houseman[(num_cpgs*(i-1)*2 + 1):(num_cpgs*(i-1)*2 + num_cpgs), i] <- 0
+    zmat_houseman[(num_cpgs*(i-1)*2 + num_cpgs + 1):(num_cpgs*i*2), i] <- 1 
   }
   colnames(zmat_houseman) <- cell_levels
   

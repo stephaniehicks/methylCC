@@ -8,7 +8,6 @@ setClass(Class = "estimatecc",
          representation = representation(
            summary = "list",
            cell_counts = "data.frame",
-           theta = "data.frame",
            ymat = "data.frame",
            zmat = "data.frame",
            gr_object = "GRanges",
