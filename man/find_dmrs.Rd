@@ -7,8 +7,8 @@
 \usage{
 find_dmrs(verbose = TRUE, gr_target = NULL, include_cpgs = FALSE,
   include_dmrs = TRUE, num_cpgs = 50, num_regions = 50,
-  bumphunter_beta_cutoff = 0.2, dmr_up_cutoff = 0.6,
-  dmr_down_cutoff = 0.5, dmr_pval_cutoff = 1e-11,
+  bumphunter_beta_cutoff = 0.2, dmr_up_cutoff = 0.5,
+  dmr_down_cutoff = 0.4, dmr_pval_cutoff = 1e-11,
   cpg_pval_cutoff = 1e-08, cpg_up_dm_cutoff = 0,
   cpg_down_dm_cutoff = 0, pairwise_comparison = FALSE,
   mset_train_flow_sort = NULL)
