@@ -117,14 +117,13 @@ estimatecc <- function(object, find_dmrs_object = NULL, region_mat = NULL,
   
   # set up objects
   cell_counts  <- data.frame(array(NA, dim=c(n,K)))
-  # theta_final <- data.frame(array(NA, dim=c(n,6)))
   nregions_final = array(NA, dim = n)                
   samples_with_na <- apply(ymat, 2, function(x) { any(is.na(x)) })
   
   ## Include verbose messages about parameter estimation
   if(verbose){
     mes <- "[estimatecc] Starting parameter estimation using %s regions."
-    message(sprintf(mes, R, n))
+    message(sprintf(mes, R))
   }
   
   if(any(samples_with_na)){
@@ -153,14 +152,12 @@ estimatecc <- function(object, find_dmrs_object = NULL, region_mat = NULL,
                           epsilon=epsilon, max_iter = max_iter)
       
       cell_counts[ii,] <- as.data.frame(finalMLEs$pi_mle)
-      # theta_final[ii,] <- as.data.frame(
-      #   finalMLEs$theta[nrow(finalMLEs$theta), ])
-    }
+     }
   } 
   
   if(any(!samples_with_na)){
     
-    ymat_sub <- ymat[, !samples_with_na]
+    ymat_sub <- as.matrix(ymat[, !samples_with_na])
     cut_samples <- factor(cut(seq_len(ncol(ymat_sub)),
                               breaks = unique(c(seq(0, ncol(ymat_sub), by = 100), 
                                          ncol(ymat_sub)))))
@@ -173,31 +170,24 @@ estimatecc <- function(object, find_dmrs_object = NULL, region_mat = NULL,
       init_step <- 
         .initializeMLEs(init_param_method = init_param_method,
                         n = n, K = K, 
-                        Ys = ymat_sub[, keep_inds], Zs = zmat, 
+                        Ys = as.matrix(ymat_sub[, keep_inds]), Zs = zmat, 
                         a0init = a0init, a1init = a1init, 
                         sig0init = sig0init, sig1init = sig1init, 
                         tauinit = tauinit)
     
       # Run EM algorithm
       finalMLEs <- 
-        .methylcc_engine(Ys = ymat_sub[, keep_inds], Zs = zmat,
+        .methylcc_engine(Ys = as.matrix(ymat_sub[, keep_inds]), Zs = zmat,
                          current_pi_mle = init_step$init_pi_mle,
                          current_theta = init_step$init_theta,
                          epsilon=epsilon, max_iter = max_iter)
       final_mles <- rbind(final_mles, finalMLEs$pi_mle)
-      print(levels(cut_samples)[ind])
+      # print(levels(cut_samples)[ind])
     }
     
     # recored results
     cell_counts[!samples_with_na,] <- as.data.frame(final_mles)
     nregions_final[!samples_with_na] <- rep(R, sum(!samples_with_na))
-    # if(all(!samples_with_na)){ 
-    #  theta_all_final <-  as.data.frame(finalMLEs$theta)
-    # } else { 
-    #   theta_final[!samples_with_na,] <- 
-    #    as.data.frame(t(replicate(sum(!samples_with_na),
-    #                               c(finalMLEs$theta[nrow(finalMLEs$theta), ]))))
-    # }
   }
   
   if(verbose){
@@ -208,11 +198,6 @@ estimatecc <- function(object, find_dmrs_object = NULL, region_mat = NULL,
   
   colnames(cell_counts) <- ids
   results@cell_counts <- cell_counts
-  # if(all(!samples_with_na)){ 
-  #  results@theta <- theta_all_final
-  # } else { 
-  #  results@theta <- theta_final
-  # }  
   results@summary <- list("class" = class(object),
                           "n_samples" = n, "celltypes" = ids,
                           "sample_names" = colnames(ymat),
