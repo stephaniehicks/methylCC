@@ -1,0 +1,34 @@
+Package: methylCC
+Title: Estimate the cell composition of whole blood in DNA methylation samples
+Version: 0.99.0
+Authors@R: c(
+    person(c("Stephanie", "C."), "Hicks", role = c("aut", "cre"), 
+		email = "shicks19@jhu.edu", 
+		comment = c(ORCID = "0000-0002-7858-0231")),
+    person("Rafael", "Irizarry", role = "aut", 
+		comment = c(ORCID = "0000-0002-3944-4309")))
+Imports: Biobase, GenomicRanges, IRanges, S4Vectors,
+    dplyr, magrittr, minfi, bsseq, quadprog, plyranges, 
+    stats, utils, bumphunter, genefilter,
+    FlowSorted.Blood.450k, methods,
+    IlluminaHumanMethylation450kmanifest,
+    IlluminaHumanMethylation450kanno.ilmn12.hg19
+Depends: R (>= 3.6)
+Suggests: 
+    knitr,
+    testthat (>= 2.1.0),
+    BiocGenerics,
+    BiocStyle,
+    tidyr,
+    ggplot2
+Description: A tool to estimate the cell composition
+    of DNA methylation whole blood sample measured on any
+    platform technology (microarray and sequencing).
+biocViews: Microarray, Sequencing, DNAMethylation, 
+    MethylationArray, MethylSeq, WholeGenome
+VignetteBuilder: knitr
+RoxygenNote: 6.1.1
+Encoding: UTF-8
+License: CC BY 4.0
+BugReports: https://github.com/stephaniehicks/methylCC/
+URL: https://github.com/stephaniehicks/methylCC/

@@ -1,0 +1,174 @@
+---
+title: "The methylCC user's guide"
+author:
+- name: Stephanie C. Hicks
+  affiliation: Johns Hopkins Bloomberg School of Public Health
+- name: Rafael A. Irizarry 
+  affiliation: Dana-Farber Cancer Institute
+output:
+  BiocStyle::html_document:
+    toc_float: true
+package: methylCC
+abstract: |
+ Smooth quantile normalization
+   is a generalization of quantile normalization, 
+   which is average of the two types of assumptions 
+   about the data generation process: quantile normalization
+   and quantile normalization between groups.
+vignette: |
+  %\VignetteIndexEntry{The qsmooth user's guide}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r, echo=FALSE, results="hide", message=FALSE}
+require(knitr)
+opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+```
+
+```{r style, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+
+# Introduction
+
+There are several approaches available to adjust for differents in the
+relative proportion of cell types in whole blood measured from
+DNA methylation (DNAm). For example, *reference-based approaches*
+require the use of reference data sets made up of purified cell types to
+identify cell type-specific DNAm signatures. These cell type-specific DNAm
+signatures are used to estimate the relative proportions of cell types
+directly, but these reference data sets are laborious and expensive to
+collect. Furthermore, these reference data sets will need to be
+continuously collected over time as new platform technologies emerge
+measuring DNAm because the observed methylation levels for the same CpGs
+in the same sample vary depending the platform technology.
+
+In contrast, there are *reference-free approaches*,
+which are based on methods related to surrogate variable analysis or
+linear mixed models. These approaches do not provide
+estimates of the relative proportions of cell types, but rather these
+methods just remove the variability induced from the differences in
+relative cell type proportions in whole blood samples.
+
+Here, we present a statistical model that estimates the cell composition
+of whole blood samples measured from DNAm. The method can be applied
+to microarray or sequencing data (for example whole-genome bisulfite
+sequencing data, WGBS, reduced representation bisulfite sequencing
+data, RRBS). Our method is based on the
+idea of identifying informative genomic regions that are clearly
+methylated or unmethylated for each cell type, which permits
+estimation in multiple platform technologies as cell types preserve
+their methylation state in regions independent of platform despite
+observed measurements being platform dependent.
+
+
+# Getting Started
+
+Load the `methylCC` R package and other packages that we'll need 
+later on. 
+
+```{r loadlibs, message=FALSE, warning=FALSE}
+library(FlowSorted.Blood.450k)
+library(methylCC)
+library(minfi)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+
+# Data
+
+## Whole Blood Illumina 450k Microarray Data Example
+
+```{r data-load, message=FALSE}
+# Phenotypic information about samples
+head(pData(FlowSorted.Blood.450k))
+
+# RGChannelSet
+rgset <- FlowSorted.Blood.450k[,
+                pData(FlowSorted.Blood.450k)$CellTypeLong %in% "Whole blood"]
+```
+
+
+# Using the `estimatecc()` function
+
+## Input for `estimatecc()`
+The `estimatecc()` function must have
+one object as input:
+
+1. an `object` such as an `RGChannelSet` from
+the R package `minfi` or a `BSseq` object
+from the R package `bsseq`. This object should 
+contain observed DNAm levels at CpGs (rows) 
+in a set of $N$ whole blood samples (columns). 
+
+## Running `estimatecc()`
+
+In this example, we are interested in estimating the cell
+composition of the whole blood samples listed in the
+`FlowSorted.Blood.450k` R/Bioconductor package.
+To run the `methylcC::estimatecc()` function,
+just provide the `RGChannelSet`. This will
+create an `estimatecc` object. We
+will call the object `est`.
+
+
+```{r run-estimatecc1, message=FALSE}
+est <- estimatecc(object = rgset) 
+est
+```
+
+To see the cell composition estimates, use the
+`cell_counts()` function.
+
+```{r run-estimatecc-summaries}
+cell_counts(est)
+```
+
+
+## Compare to `minfi::estimateCellCounts()` 
+
+We can also use the `estimateCellCounts()` from R/Bioconductor package
+[`minfi`](http://bioconductor.org/packages/release/bioc/html/minfi.html)
+to estimate the cell composition for each of the whole blood samples. 
+
+```{r run-minfi-estimateCellCounts}
+sampleNames(rgset) <- paste0("Sample", 1:6)
+
+est_minfi <- minfi::estimateCellCounts(rgset)
+est_minfi
+```
+
+Then, we can compare the estimates to `methylCC::estimatecc()`. 
+
+```{r compare-estimates}
+df_minfi = gather(cbind("samples" = rownames(cell_counts(est)),
+                        as.data.frame(est_minfi)),
+                  celltype, est, -samples)
+
+df_methylCC = gather(cbind("samples" = rownames(cell_counts(est)),
+                           cell_counts(est)),
+                     celltype, est, -samples)
+
+dfcombined <- full_join(df_minfi, df_methylCC, 
+                               by = c("samples", "celltype"))
+
+ggplot(dfcombined, aes(x=est.x, y = est.y, color = celltype)) +
+    geom_point() + xlim(0,1) + ylim(0,1) +
+    geom_abline(intercept = 0, slope = 1) +
+    xlab("Using minfi::estimateCellCounts()") + 
+    ylab("Using methylCC::estimatecc()") +
+    labs(title = "Comparing cell composition estimates")
+```
+
+We see the estimates closely match for the six cell types. 
+
+
+# SessionInfo
+
+```{r sessionInfo, results='markup'}
+sessionInfo()
+```
+
