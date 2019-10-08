@@ -4,3 +4,5 @@
   - bumping version number to trigger build
 * methylCC version 0.99.2
   - fixing bugs in bioc build
+* methylCC version 0.99.3
+  - Adding a tryCatch if too few DMRs

@@ -7,6 +7,7 @@
 \usage{
 estimatecc(object, find_dmrs_object = NULL, verbose = TRUE,
   epsilon = 0.01, max_iter = 100, take_intersection = FALSE,
+  include_cpgs = FALSE, include_dmrs = TRUE,
   init_param_method = "random", a0init = NULL, a1init = NULL,
   sig0init = NULL, sig1init = NULL, tauinit = NULL)
 }
@@ -31,6 +32,12 @@ algorithm. Default is 100 iterations.}
 \item{take_intersection}{TRUE/FALSE asking if only the CpGs 
 included in \code{object} should be used to find DMRs. 
 Default is FALSE.}
+
+\item{include_cpgs}{TRUE/FALSE. Should individual CpGs
+be returned. Default is FALSE.}
+
+\item{include_dmrs}{TRUE/FALSE. Should differentially 
+methylated regions be returned. Default is TRUE.}
 
 \item{init_param_method}{method to initialize parameter estimates.
 Choose between "random" (randomly sample) or "known_regions"
@@ -64,12 +71,15 @@ the cell composition estimates themselves
 Estimate cell composition from DNAm data
 }
 \examples{
-\dontrun{
-library(FlowSorted.Blood.450k)
+suppressPackageStartupMessages(library(FlowSorted.Blood.450k))
 data(FlowSorted.Blood.450k)
-rgset <- FlowSorted.Blood.450k[,
-     pData(FlowSorted.Blood.450k)$CellTypeLong \%in\% "Whole blood"]
+# take a random sample to make object size in build smaller
+set.seed(12345)
+cpg_ids <- sample(seq_len(nrow(FlowSorted.Blood.450k)), 2e5)
+rgset <- FlowSorted.Blood.450k[cpg_ids,
+           pData(FlowSorted.Blood.450k)$CellTypeLong \%in\% "Whole blood"]
+set.seed(12345)
 est <- estimatecc(object = rgset) 
-}
+cell_counts(est)
 
 }

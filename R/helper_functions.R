@@ -359,6 +359,7 @@
              bvec = c(1, rep(0, K)), 
              meq = 1)$sol })))
   
+  
   return(list("init_pi_mle" = init_pi_mle, "init_theta" = init_theta))
 }
 

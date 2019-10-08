@@ -116,6 +116,7 @@ will call the object `est`.
 
 
 ```{r run-estimatecc1, message=FALSE}
+set.seed(12345)
 est <- estimatecc(object = rgset) 
 est
 ```

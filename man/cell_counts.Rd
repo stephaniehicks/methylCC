@@ -24,13 +24,15 @@ cell composition estimates
 Accessors for the 'cell_counts' slot of a estimatecc object.
 }
 \examples{
-\dontrun{
-library(FlowSorted.Blood.450k)
+suppressPackageStartupMessages(library(FlowSorted.Blood.450k))
 data(FlowSorted.Blood.450k)
-rgset <- FlowSorted.Blood.450k[,
-     pData(FlowSorted.Blood.450k)$CellTypeLong \%in\% "Whole blood"]
+# take a random sample to make object size in build smaller
+set.seed(12345)
+cpg_ids <- sample(seq_len(nrow(FlowSorted.Blood.450k)), 2e5)
+rgset <- FlowSorted.Blood.450k[cpg_ids,
+           pData(FlowSorted.Blood.450k)$CellTypeLong \%in\% "Whole blood"]
+set.seed(12345)
 est <- estimatecc(object = rgset) 
 cell_counts(est)
-}
 
 }

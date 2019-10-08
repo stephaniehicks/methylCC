@@ -16,7 +16,11 @@
 #' algorithm. Default is 100 iterations.
 #' @param take_intersection TRUE/FALSE asking if only the CpGs 
 #' included in \code{object} should be used to find DMRs. 
-#' Default is FALSE. 
+#' Default is FALSE.
+#' @param include_cpgs TRUE/FALSE. Should individual CpGs
+#' be returned. Default is FALSE. 
+#' @param include_dmrs TRUE/FALSE. Should differentially 
+#' methylated regions be returned. Default is TRUE. 
 #' @param init_param_method method to initialize parameter estimates.
 #' Choose between "random" (randomly sample) or "known_regions"
 #' (uses unmethyalted and methylated regions that were identified
@@ -48,17 +52,21 @@
 #' @export
 #' 
 #' @examples
-#' \dontrun{
-#' library(FlowSorted.Blood.450k)
+#' suppressPackageStartupMessages(library(FlowSorted.Blood.450k))
 #' data(FlowSorted.Blood.450k)
-#' rgset <- FlowSorted.Blood.450k[,
-#'      pData(FlowSorted.Blood.450k)$CellTypeLong %in% "Whole blood"]
+#' # take a random sample to make object size in build smaller
+#' set.seed(12345)
+#' cpg_ids <- sample(seq_len(nrow(FlowSorted.Blood.450k)), 2e5)
+#' rgset <- FlowSorted.Blood.450k[cpg_ids,
+#'            pData(FlowSorted.Blood.450k)$CellTypeLong %in% "Whole blood"]
+#' set.seed(12345)
 #' est <- estimatecc(object = rgset) 
-#' }
+#' cell_counts(est)
 #' 
 estimatecc <- function(object, find_dmrs_object = NULL, verbose = TRUE, 
                        epsilon = 0.01, max_iter = 100, 
                        take_intersection = FALSE,
+                       include_cpgs = FALSE, include_dmrs = TRUE,
                        init_param_method = "random", a0init = NULL,
                        a1init = NULL, sig0init = NULL, sig1init = NULL, 
                        tauinit = NULL)
@@ -75,10 +83,15 @@ estimatecc <- function(object, find_dmrs_object = NULL, verbose = TRUE,
   
   if(is.null(find_dmrs_object)){
     if(!take_intersection){
-      dmrs_found <- suppressWarnings(.find_dmrs(verbose = verbose))
+      dmrs_found <- suppressWarnings(.find_dmrs(verbose = verbose, 
+                                                include_cpgs = include_cpgs, 
+                                                include_dmrs = include_dmrs))
     } else {
       eout <- .extract_raw_data(object)
-      dmrs_found <- .find_dmrs(verbose = verbose, gr_target=eout$gr_object)
+      dmrs_found <- suppressWarnings(.find_dmrs(verbose = verbose, 
+                                                gr_target=eout$gr_object, 
+                                                include_cpgs = include_cpgs, 
+                                                include_dmrs = include_dmrs))
       rm(eout)
     }    
       celltype_specific_dmrs <- granges(dmrs_found$regions_all)
@@ -159,15 +172,22 @@ estimatecc <- function(object, find_dmrs_object = NULL, verbose = TRUE,
     for(ind in seq_len(length(levels(cut_samples)))){
       keep_inds <- (cut_samples == levels(cut_samples)[ind])
       
-      # Initialize MLEs
-      init_step <- 
+      init_step <- try(
         .initializeMLEs(init_param_method = init_param_method,
                         n = n, K = K, 
                         Ys = as.matrix(ymat_sub[, keep_inds]), Zs = zmat, 
                         a0init = a0init, a1init = a1init, 
                         sig0init = sig0init, sig1init = sig1init, 
-                        tauinit = tauinit)
-    
+                        tauinit = tauinit), silent = TRUE)
+      if(is(init_step, "try-error")){
+    message(      
+  "[estimatecc] There are not a sufficient number of differentially 
+  methylated regions (DMRs) for cell composition estimation. Try 
+  including both differntially methylated CpGs and DMRs by modifying 
+  the estimatecc(include_cpgs=TRUE, include_dmrs=TRUE) function.")
+  stop("Exiting the estimation now.")
+      }
+
       # Run EM algorithm
       finalMLEs <- 
         .methylcc_engine(Ys = as.matrix(ymat_sub[, keep_inds]), Zs = zmat,
