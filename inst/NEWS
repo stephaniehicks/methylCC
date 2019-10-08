@@ -1,2 +1,6 @@
 * methylCC version 0.99.0
 	- Preparing package for Bioconductor submission
+* methylCC version 0.99.1
+  - bumping version number to trigger build
+* methylCC version 0.99.2
+  - fixing bugs in bioc build

@@ -190,7 +190,8 @@
 
   if(is(object, "RGChannelSet") || is(object, "GenomicMethylSet")) {       
     if(verbose){
-      message("[estimatecc] Preprocessing RGChannelSet or GenomicMethylSet object.") 
+      message("[estimatecc] Preprocessing RGChannelSet or
+              GenomicMethylSet object.") 
     }
       eout <- .extract_raw_data(object) 
       keep_dmrs <- 

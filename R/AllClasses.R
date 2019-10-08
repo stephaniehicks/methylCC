@@ -18,17 +18,19 @@
 #' @aliases estimatecc-class
 #'
 #' @examples
+#' \dontrun{
 #' library(FlowSorted.Blood.450k)
 #' data(FlowSorted.Blood.450k)
 #' rgset <- FlowSorted.Blood.450k[,
 #'      pData(FlowSorted.Blood.450k)$CellTypeLong %in% "Whole blood"]
 #' est <- estimatecc(object = rgset) 
+#' }
 #' 
 setClass(
-  Class = "estimatecc", 
-  slot = list(
-    summary = "list",
-    cell_counts = "data.frame")
+    Class = "estimatecc", 
+    slot = list(
+        summary = "list",
+        cell_counts = "data.frame")
 )
 
 setMethod("show", "estimatecc",

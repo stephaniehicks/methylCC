@@ -5,8 +5,8 @@
 #' cell composition estimates 
 #' @rdname cell_counts
 setGeneric(
-  name = "cell_counts", 
-  def = function(object) { 
-    standardGeneric("cell_counts") 
-  }
+    name = "cell_counts", 
+    def = function(object) { 
+        standardGeneric("cell_counts") 
+    }
 )

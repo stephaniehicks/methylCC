@@ -48,12 +48,14 @@
 #' @export
 #' 
 #' @examples
+#' \dontrun{
 #' library(FlowSorted.Blood.450k)
 #' data(FlowSorted.Blood.450k)
 #' rgset <- FlowSorted.Blood.450k[,
 #'      pData(FlowSorted.Blood.450k)$CellTypeLong %in% "Whole blood"]
 #' est <- estimatecc(object = rgset) 
-#'
+#' }
+#' 
 estimatecc <- function(object, find_dmrs_object = NULL, verbose = TRUE, 
                        epsilon = 0.01, max_iter = 100, 
                        take_intersection = FALSE,

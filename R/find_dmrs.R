@@ -56,7 +56,7 @@
 #' @import FlowSorted.Blood.450k
 #' @import GenomicRanges
 #' @importFrom Biobase pData
-#' @importFrom bumphunter clusterMaker bumphunter
+#' @importFrom bumphunter clusterMaker loessByCluster bumphunter 
 #' @importFrom genefilter rowttests
 #' @importFrom plyranges arrange 
 #' @importFrom S4Vectors queryHits
@@ -317,7 +317,8 @@
                                       as.numeric(all_poss[ind,]))))
     }
     if(length(gr_regions_down) > 0){
-      zmat <- rbind(zmat, t(replicate(min(length(gr_regions_down), num_regions), 
+      zmat <- rbind(zmat, t(replicate(min(length(gr_regions_down), 
+                                          num_regions), 
                                       as.numeric(!all_poss[ind,]))))
     }
   }

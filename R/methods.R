@@ -16,12 +16,14 @@
 #' @export
 #' 
 #' @examples
+#' \dontrun{
 #' library(FlowSorted.Blood.450k)
 #' data(FlowSorted.Blood.450k)
 #' rgset <- FlowSorted.Blood.450k[,
 #'      pData(FlowSorted.Blood.450k)$CellTypeLong %in% "Whole blood"]
 #' est <- estimatecc(object = rgset) 
 #' cell_counts(est)
+#' }
 #' 
 setMethod(
   f = "cell_counts", 
