@@ -1,10 +1,13 @@
-* methylCC version 0.99.0
+* changes in version 0.99.0
 	- Preparing package for Bioconductor submission
-* methylCC version 0.99.1
+* changes in version 0.99.1
   - bumping version number to trigger build
-* methylCC version 0.99.2
+* changes in version 0.99.2
   - fixing bugs in bioc build
-* methylCC version 0.99.3
+* changes in version 0.99.3
   - Adding a tryCatch if too few DMRs
-* methylCC version 0.99.4
+* changes in version 0.99.4
   - shortening the run time of examples
+* changes in version 0.99.5
+  - adding a demo version of estimatecc to be 
+    used in examples of methylCC

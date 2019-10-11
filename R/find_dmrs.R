@@ -185,6 +185,7 @@
       
       # # Only include region with more than 1 CpG (L > 1)
       # #       OR only 1 CpG in region if no other larger regions possible
+      L = dm <- NULL 
       keep_ind_regions <- (bumps$table$L > 1 | 
                              (bumps$table$L==1 & bumps$table$clusterL == 1)) & 
         (bumps$table$p.value < dmr_pval_cutoff)  # ideally less than 1e-11

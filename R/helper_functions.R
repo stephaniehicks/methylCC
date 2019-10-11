@@ -70,6 +70,7 @@
     metadata_cvg = as.data.frame(mcols(intersect_cvg))
     
     # Sum M values and cvg values for all CpGs in each region (subject)
+    . <- NULL 
     out_m = metadata %>% group_by(subject_mtch) %>% 
               summarise_all(funs(sum(.,na.rm = TRUE)))
     out_cvg = metadata_cvg %>% group_by(subject_mtch) %>% 
@@ -182,6 +183,7 @@
 {
 
   if(init_param_method == "known_regions"){
+    offMethRegions = onMethRegions <- NULL 
     dir <- system.file("data", package="methylCC")
     file_off <- file.path(dir, "offMethRegions.RData") 
     file_on  <- file.path(dir, "onMethRegions.RData") 

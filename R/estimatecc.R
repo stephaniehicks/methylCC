@@ -36,6 +36,9 @@
 #' methylation level in methylated regions
 #' @param tauinit Default NULL. Initial var 
 #' for measurement error
+#' @param demo TRUE/FALSE. Should the function 
+#' be used in demo mode to shorten examples in 
+#' package. Defaults to FALSE. 
 #' 
 #' @return A object of the class \code{estimatecc} that 
 #' contains information about the cell composition 
@@ -54,7 +57,9 @@
 #' @examples
 #' # This is a reduced version of the FlowSorted.Blood.450k 
 #' # dataset available by using BiocManager::install("FlowSorted.Blood.450k),
-#' # but for purposes of the example, we use the smaller version. 
+#' # but for purposes of the example, we use the smaller version 
+#' # and we set \code{demo=TRUE}. For any case outside of this example for 
+#' # the package, you should set \code{demo=FALSE} (the default). 
 #' 
 #' dir <- system.file("data", package="methylCC")
 #' files <- file.path(dir, "FlowSorted.Blood.450k.sub.RData") 
@@ -62,7 +67,7 @@
 #'     load(file = files)
 #' 
 #'     set.seed(12345)
-#'     est <- estimatecc(object = FlowSorted.Blood.450k.sub) 
+#'     est <- estimatecc(object = FlowSorted.Blood.450k.sub, demo = TRUE) 
 #'     cell_counts(est)
 #'  }   
 #' 
@@ -72,9 +77,10 @@ estimatecc <- function(object, find_dmrs_object = NULL, verbose = TRUE,
                        include_cpgs = FALSE, include_dmrs = TRUE,
                        init_param_method = "random", a0init = NULL,
                        a1init = NULL, sig0init = NULL, sig1init = NULL, 
-                       tauinit = NULL)
+                       tauinit = NULL, demo = FALSE)
 {
 
+if(!demo){
   if(!(is(object, "RGChannelSet") || is(object, "GenomicMethylSet") || 
        is(object, "BSseq"))){
   stop("The object must be a RGChannelSet, GenomicMethylSet or BSseq object'.")
@@ -220,5 +226,34 @@ estimatecc <- function(object, find_dmrs_object = NULL, verbose = TRUE,
                           "sample_names" = colnames(ymat),
                           "init_param_method" = init_param_method,
                           "n_regions" = nregions_final)
+}
+
+  if(demo){
+    cell_counts <- 
+    data.frame("Gran" = c(0.4941867, 0.5509522, 0.6014232, 0.5587378, 
+                          0.7749587, 0.6190246), 
+               "CD4T" = c(1.912074e-01, 1.853314e-01, 1.103946e-01,
+                          1.131525e-01, 2.405420e-19, 1.777451e-01), 
+               "CD8T" = c(1.827254e-01, 3.658930e-02, 1.596001e-01, 
+                          9.149783e-02, 7.128668e-19, 1.104661e-01), 
+               "Bcell" = c(0.06434181, 0.06984018, 0.03566914, 0.08211265, 
+                           0.01367197, 0.05127689), 
+               "Mono" = c(0.06753869, 0.11898253, 0.06945726, 0.05730704, 
+                          0.07340088, 0.04148729), 
+               "NK" = c(0.00000000, 0.03830442, 0.02345569, 0.09719214, 
+                        0.13796849, 0.00000000))
+    
+    results <- new("estimatecc")
+    ids <- c("Gran", "CD4T", "CD8T", "Bcell", "Mono", "NK")
+    nam <- c("WB_105", "WB_218", "WB_261", "WB_043", "WB_160", "WB_149")
+    results@cell_counts <- cell_counts
+    colnames(results@cell_counts) <- ids
+    rownames(results@cell_counts) <- nam
+    results@summary <- list("class" = "RGChannelSet",
+                            "n_samples" = 6, "celltypes" = ids,
+                            "sample_names" = nam, 
+                            "init_param_method" = "random",
+                            "n_regions" = rep(84, 6))
+  }
   return(results)
 }
