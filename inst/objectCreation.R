@@ -1,12 +1,30 @@
+#' @title A reduced size of the FlowSorted.Blood.450k dataset 
+#' 
+#' @description A reduced size of the FlowSorted.Blood.450k dataset 
+#' 
+#' @docType data 
+#' @format A RGset object with 2e5 rows (probes)
+#' and 6 columns (whole blood samples).
+#' 
+library(FlowSorted.Blood.450k)
+data(FlowSorted.Blood.450k)
+# take a random sample to make object size in build smaller
+set.seed(12345)
+cpg_ids <- sample(seq_len(nrow(FlowSorted.Blood.450k)), 1.5e5)
+FlowSorted.Blood.450k.sub <- FlowSorted.Blood.450k[cpg_ids,
+            pData(FlowSorted.Blood.450k)$CellTypeLong %in% "Whole blood"]
+
+## Save FlowSorted.Blood.450k.sub
+save(FlowSorted.Blood.450k.sub, 
+     file = "data/FlowSorted.Blood.450k.sub.RData", 
+     compress='xz') 
+
 #' @title Regions with low methylation values in six pure blood cell types
 #'
 #' @description
 #' This script is used to create a ADD ME
 #'
 #' @docType data
-#' @keywords datasets
-#' @format A MethylSet object with 1e4 rows (probes)
-#' and 58 columns (samples).
 #'
 library(FlowSorted.Blood.450k)
 library(minfi)
@@ -63,7 +81,6 @@ save(offMethRegions, file = "data/offMethRegions.RData", compress='xz')
 #' This script is used to create a ADD ME
 #'
 #' @docType data
-#' @keywords datasets
 #' @format A MethylSet object with 1e4 rows (probes)
 #' and 58 columns (samples).
 #' 

@@ -182,10 +182,17 @@
 {
 
   if(init_param_method == "known_regions"){
-      suppressMessages(data(offMethRegions))
-      suppressMessages(data(onMethRegions))
+    dir <- system.file("data", package="methylCC")
+    file_off <- file.path(dir, "offMethRegions.RData") 
+    file_on  <- file.path(dir, "onMethRegions.RData") 
+    if(file.exists(file_off)){
+      load(file = file_off)
       grd0 = makeGRangesFromDataFrame(offMethRegions)
+    } 
+    if(file.exists(file_on)){
+      load(file = file_on)
       grd1 = makeGRangesFromDataFrame(onMethRegions)
+    } 
   }
 
   if(is(object, "RGChannelSet") || is(object, "GenomicMethylSet")) {       

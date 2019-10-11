@@ -53,8 +53,8 @@
 #' @return A list of data frames and GRanges objects.
 #' 
 #' @import minfi 
-#' @import FlowSorted.Blood.450k
 #' @import GenomicRanges
+#' @import FlowSorted.Blood.450k
 #' @importFrom Biobase pData
 #' @importFrom bumphunter clusterMaker loessByCluster bumphunter 
 #' @importFrom genefilter rowttests
@@ -74,7 +74,6 @@
                       mset_train_flow_sort=NULL) {
 
   if(is.null(mset_train_flow_sort)){
-    # suppressPackageStartupMessages(require(FlowSorted.Blood.450k))
     FlowSorted.Blood.450k <- updateObject(FlowSorted.Blood.450k)
     mset_train_flow_sort <- preprocessIllumina(FlowSorted.Blood.450k)
     mset_train_flow_sort <- mapToGenome(mset_train_flow_sort, 

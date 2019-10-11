@@ -6,3 +6,5 @@
   - fixing bugs in bioc build
 * methylCC version 0.99.3
   - Adding a tryCatch if too few DMRs
+* methylCC version 0.99.4
+  - shortening the run time of examples
