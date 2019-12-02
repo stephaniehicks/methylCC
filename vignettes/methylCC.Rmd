@@ -16,7 +16,7 @@ abstract: |
    about the data generation process: quantile normalization
    and quantile normalization between groups.
 vignette: |
-  %\VignetteIndexEntry{The qsmooth user's guide}
+  %\VignetteIndexEntry{The methylCC user's guide}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
