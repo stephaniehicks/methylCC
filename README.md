@@ -2,7 +2,7 @@
 
 ### Citation 
 
-Hicks SC, Irizarry RA. (2019). _Genome Biology_ (accepted and in press)
+Hicks SC, Irizarry RA. (2019). _Genome Biology_ **20**, 261. [https://doi.org/10.1186/s13059-019-1827-8](https://doi.org/10.1186/s13059-019-1827-8)
 
 ### Why use methylCC? 
 

@@ -1,0 +1,12 @@
+bibentry(bibtype = "Article",
+           key = "methylCC",
+           author = c(person(c("Stephanie", "C."), "Hicks"),     
+                      person(c("Rafael", "A."), "Irizarry")),
+           title = "methylCC: technology-independent estimation of cell type composition using differentially methylated regions",
+           journal = "Genome Biology",
+           year = "2019",
+           volume = "20",
+           number = "261",
+           pubmed = "31783894",
+	   header = "The methylCC package is described in:")
+

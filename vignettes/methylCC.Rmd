@@ -10,11 +10,9 @@ output:
     toc_float: true
 package: methylCC
 abstract: |
- Smooth quantile normalization
-   is a generalization of quantile normalization, 
-   which is average of the two types of assumptions 
-   about the data generation process: quantile normalization
-   and quantile normalization between groups.
+ A tool to estimate the cell composition of DNA 
+   methylation whole blood sample measured on any 
+   platform technology (microarray and sequencing).
 vignette: |
   %\VignetteIndexEntry{The methylCC user's guide}
   %\VignetteEngine{knitr::rmarkdown}
