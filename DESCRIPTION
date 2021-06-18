@@ -1,6 +1,6 @@
 Package: methylCC
 Title: Estimate the cell composition of whole blood in DNA methylation samples
-Version: 1.7.0
+Version: 1.7.1
 Authors@R: c(
     person(c("Stephanie", "C."), "Hicks", role = c("aut", "cre"), 
 		email = "shicks19@jhu.edu", 
@@ -14,6 +14,7 @@ Imports: Biobase, GenomicRanges, IRanges, S4Vectors,
     IlluminaHumanMethylation450kanno.ilmn12.hg19
 Depends: R (>= 3.6), FlowSorted.Blood.450k
 Suggests: 
+    rmarkdown,
     knitr,
     testthat (>= 2.1.0),
     BiocGenerics,

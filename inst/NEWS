@@ -13,3 +13,5 @@
     used in examples of methylCC
 * changes in version 1.1.1
   - added Genome Biology citation
+* changes in version 1.7.1
+  - added `rmarkdown` to Suggests in DESCRIPTION file per changes in `knitr`
