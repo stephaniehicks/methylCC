@@ -15,3 +15,5 @@
   - added Genome Biology citation
 * changes in version 1.7.1
   - added `rmarkdown` to Suggests in DESCRIPTION file per changes in `knitr`
+* changes in version 1.13.1
+  - removed CC BY 4.0 license and replaced with GPL-3

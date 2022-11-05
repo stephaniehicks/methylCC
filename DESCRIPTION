@@ -1,6 +1,6 @@
 Package: methylCC
 Title: Estimate the cell composition of whole blood in DNA methylation samples
-Version: 1.13.0
+Version: 1.13.1
 Authors@R: c(
     person(c("Stephanie", "C."), "Hicks", role = c("aut", "cre"), 
 		email = "shicks19@jhu.edu", 
@@ -29,6 +29,6 @@ biocViews: Microarray, Sequencing, DNAMethylation,
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 Encoding: UTF-8
-License: CC BY 4.0
+License: GPL-3
 BugReports: https://github.com/stephaniehicks/methylCC/
 URL: https://github.com/stephaniehicks/methylCC/
