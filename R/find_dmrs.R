@@ -58,7 +58,6 @@
 #' @importFrom Biobase pData
 #' @importFrom bumphunter clusterMaker loessByCluster bumphunter 
 #' @importFrom genefilter rowttests
-#' @importFrom plyranges arrange 
 #' @importFrom S4Vectors queryHits
 #' @importFrom stats model.matrix
 #' @importFrom utils head
@@ -204,8 +203,9 @@
         names(mcols(gr_regions_up))[
           names(mcols(gr_regions_up)) == "dmr_up_max_diff"] <- "dmr_max_diff"
 
-        gr_regions_up <- gr_regions_up %>% arrange(-L, dm) %>% 
-                              head(num_regions)
+        gr_regions_up <- gr_regions_up[order(-gr_regions_up$L, gr_regions_up$dm), ]
+        gr_regions_up <- head(gr_regions_up, num_regions)
+
       } else {
         gr_regions_up <- GRanges()
       }
@@ -225,9 +225,10 @@
                               "dmr_status", "dmr_down_max_diff")]
         names(mcols(gr_regions_down))[names(mcols(gr_regions_down)) 
                                       == "dmr_down_max_diff"] <- "dmr_max_diff"
-        gr_regions_down <- gr_regions_down %>% 
-                              arrange(-L, -dm) %>% 
-                              head(num_regions)
+      
+        gr_regions_down <- gr_regions_down[order(-gr_regions_down$L, -gr_regions_down$dm), ]
+        gr_regions_down <- head(gr_regions_down, num_regions)
+
       } else {
         gr_regions_down <- GRanges()
       }
@@ -256,8 +257,8 @@
                                   gr_probe[,c("indexStart", "indexEnd", 
                                               "L", "p.value", "dm", 
                                               "dmr_status")]))
-        gr_regions_up <- gr_regions_up %>% arrange(-L, dm) %>% 
-                            head(num_regions)
+        gr_regions_up <- gr_regions_up[order(-gr_regions_up$L, gr_regions_up$dm), ]
+        gr_regions_up <- head(gr_regions_up, num_regions)
       } 
       
       tstats_down <- tstats[order(tstats[, "dm"], decreasing = TRUE), ]
@@ -278,9 +279,8 @@
                                     gr_probe[,c("indexStart", "indexEnd", 
                                                 "L", "p.value", "dm", 
                                                 "dmr_status")]))
-        gr_regions_down <- gr_regions_down %>% 
-                            arrange(-L, -dm) %>% 
-                            head(num_regions)
+        gr_regions_down <- gr_regions_down[order(-gr_regions_down$L, -gr_regions_down$dm), ]
+        gr_regions_down <- head(gr_regions_down, num_regions)
       } 
     }
     
