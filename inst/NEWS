@@ -19,3 +19,5 @@
   - removed CC BY 4.0 license and replaced with GPL-3
 * changes in version 1.25.1
   - removed depend on plyranges
+* changes in version 1.25.2
+  - bumping to trigger a build
